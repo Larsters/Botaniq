@@ -1,5 +1,5 @@
 {
-    "beans": {
+    "Beans": {
       "watering_frequency_days": 2,
       "ideal_ph": [6.0, 7.0],
       "fertilizer": "Nitrogen-rich",
@@ -11,7 +11,7 @@
       "fertilizer": "Balanced NPK with higher phosphorus during flowering",
       "temperature_range_celsius": [20, 30]
     },
-    "basil": {
+    "Basil": {
       "watering_frequency_days": 1,
       "ideal_ph": [6.0, 7.5],
       "fertilizer": "Nitrogen-rich",

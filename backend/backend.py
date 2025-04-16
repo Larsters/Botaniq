@@ -1,7 +1,7 @@
 
 import os
 import json
-DATASET_PATH = os.path.join(os.path.dirname(__file__), 'dataset.json')
+DATASET_PATH = os.path.join(os.path.dirname(__file__), 'data/dataset.json')
 
 def get_recommendations(plant_type, soil_type=None, soil_ph=None, lat=None, lon=None):
     with open(DATASET_PATH, 'r') as file:

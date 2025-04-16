@@ -3,8 +3,7 @@ import os
 from telegram import ReplyKeyboardMarkup, Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
 from services.weather import get_current_weather, get_soil_data
-from services.misc import user_waiting_for_plant, user_data, user_location, handle_text
-from backend.backend import get_recommendations
+from misc import user_waiting_for_plant, user_data, user_location, handle_text
 
 load_dotenv()
 
@@ -38,7 +37,7 @@ async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                     f"With the most probable soil type: {soil_type}"     
                                     )
     plant_keyboard = [
-        [KeyboardButton("Beans"), KeyboardButton("Canabis")],
+        [KeyboardButton("Beans"), KeyboardButton("Cannabis")],
         [KeyboardButton("Basil"), KeyboardButton("Other")]
     ]
     await update.message.reply_text(
