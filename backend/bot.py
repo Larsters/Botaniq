@@ -4,6 +4,7 @@ from telegram import ReplyKeyboardMarkup, Update, KeyboardButton, ReplyKeyboardM
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
 from services.weather import get_current_weather, get_soil_data
 from services.misc import user_waiting_for_plant, user_data, user_location, handle_text
+from backend.backend import get_recommendations
 
 load_dotenv()
 

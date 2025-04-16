@@ -1,0 +1,20 @@
+{
+    "beans": {
+      "watering_frequency_days": 2,
+      "ideal_ph": [6.0, 7.0],
+      "fertilizer": "Nitrogen-rich",
+      "temperature_range_celsius": [15, 25]
+    },
+    "cannabis": {
+      "watering_frequency_days": 3,
+      "ideal_ph": [5.8, 6.5],
+      "fertilizer": "Balanced NPK with higher phosphorus during flowering",
+      "temperature_range_celsius": [20, 30]
+    },
+    "basil": {
+      "watering_frequency_days": 1,
+      "ideal_ph": [6.0, 7.5],
+      "fertilizer": "Nitrogen-rich",
+      "temperature_range_celsius": [24, 32]
+    }
+  }
