@@ -1,6 +1,8 @@
+from http import client
 import requests
 import os
 from dotenv import load_dotenv
+from httpx import Client
 
 load_dotenv()
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
@@ -21,4 +23,11 @@ def get_forecast_weather(lat, lon):
     response = requests.get(url)
     return response.json()
 
-# Optional: historical (requires paid plan)
+
+def get_soil_data(lat, lon):
+    url = (
+        f"https://api.openepi.io/soil/type?"
+        f"lat={lat}&lon={lon}"
+    )
+    response = requests.get(url)
+    return response.json()
