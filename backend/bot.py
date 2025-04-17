@@ -4,6 +4,7 @@ from telegram import ReplyKeyboardMarkup, Update, KeyboardButton, ReplyKeyboardM
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
 from services.weather import get_current_weather, get_soil_data
 from misc import user_waiting_for_plant, user_data, user_location, handle_text
+from data.connect import insert_or_update_user_plant, get_user_plant
 
 load_dotenv()
 
@@ -24,6 +25,7 @@ async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     location = update.message.location
     lat, lon = location.latitude, location.longitude
+    username = update.message.from_user.username
     user_location[user_id] = (lat, lon)
     weather = get_current_weather(lat, lon)
     temp = weather["main"]["temp"]
@@ -31,6 +33,7 @@ async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     description = weather["weather"][0]["description"]
     soil_data = get_soil_data(lat, lon)
     soil_type = soil_data.get("properties", {}).get("most_probable_soil_type", "Unknown")
+    insert_or_update_user_plant(user_id, plant=None, latitude=lat, longitude=lon, username=username, soil_ph=None,last_temperature=temp)
     await update.message.reply_text(f"Location received: {lat}, {lon}"
                                     f"\nCurrent weather: {description}, "
                                     f"Temperature: {temp}°C, Humidity: {humidity}% "

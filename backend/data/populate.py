@@ -8,6 +8,7 @@ def create_tables():
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS user_plants (
                 user_id INTEGER PRIMARY KEY,
+                username TEXT,
                 plant TEXT NOT NULL,
                 latitude REAL NOT NULL,
                 longitude REAL NOT NULL,
