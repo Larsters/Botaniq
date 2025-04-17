@@ -7,34 +7,36 @@ def get_connection():
     """Get a new database connection."""
     return sqlite3.connect(DB_PATH)
 
-def insert_or_update_user_plant(user_id, plant, latitude, longitude, username, soil_ph=None, last_temperature=None):
-    """Insert or update a user's plant record."""
+def insert_or_update_user(user_id, username):
+    """Insert or update a user record."""
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO user_plants (user_id, plant, latitude, longitude, username, soil_ph, last_temperature)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO users (user_id, username)
+            VALUES (?, ?)
             ON CONFLICT(user_id) DO UPDATE SET
-                plant=excluded.plant,
-                latitude=excluded.latitude,
-                longitude=excluded.longitude,
-                username=excluded.username,
-                soil_ph=excluded.soil_ph,
-                last_temperature=excluded.last_temperature,
-                timestamp=CURRENT_TIMESTAMP
-        """, (user_id, plant, latitude, longitude, username, soil_ph, last_temperature))
+                username=excluded.username
+        """, (user_id, username))
         conn.commit()
 
-def get_user_plant(user_id):
-    """Retrieve a user's plant record."""
+def insert_farm(user_id, name, latitude, longitude, soil_type=None, soil_ph=None):
+    """Insert a new farm record."""
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM user_plants WHERE user_id = ?", (user_id,))
-        return cursor.fetchone()
+        cursor.execute("""
+            INSERT INTO farms (user_id, name, latitude, longitude, soil_type, soil_ph)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (user_id, name, latitude, longitude, soil_type, soil_ph))
+        conn.commit()
+        return cursor.lastrowid
 
-def get_all_users():
-    """Retrieve all user plant records."""
+def insert_plant(farm_id, plant_type, last_temperature):
+    """Insert a new plant record."""
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM user_plants")
-        return cursor.fetchall()
+        cursor.execute("""
+            INSERT INTO plants (farm_id, plant_type, last_temperature)
+            VALUES (?, ?, ?)
+        """, (farm_id, plant_type, last_temperature))
+        conn.commit()
+        return cursor.lastrowid

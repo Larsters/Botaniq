@@ -3,8 +3,9 @@ import os
 from telegram import ReplyKeyboardMarkup, Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
 from services.weather import get_current_weather, get_soil_data
-from misc import user_waiting_for_plant, user_data, user_location, handle_text
-from data.connect import insert_or_update_user_plant, get_user_plant
+from misc import user_data, user_location, handle_text
+from data.connect import insert_or_update_user, insert_farm
+from shared import user_waiting_for_plant
 
 load_dotenv()
 
@@ -23,22 +24,33 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 # handles location messages
 async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
+    username = update.effective_user.username
     location = update.message.location
     lat, lon = location.latitude, location.longitude
-    username = update.message.from_user.username
-    user_location[user_id] = (lat, lon)
+
+    # 1. Insert or update user
+    insert_or_update_user(user_id, username)
+
+    # 2. Get weather and soil data
     weather = get_current_weather(lat, lon)
     temp = weather["main"]["temp"]
     humidity = weather["main"]["humidity"]
     description = weather["weather"][0]["description"]
     soil_data = get_soil_data(lat, lon)
     soil_type = soil_data.get("properties", {}).get("most_probable_soil_type", "Unknown")
-    insert_or_update_user_plant(user_id, plant=None, latitude=lat, longitude=lon, username=username, soil_ph=None,last_temperature=temp)
-    await update.message.reply_text(f"Location received: {lat}, {lon}"
-                                    f"\nCurrent weather: {description}, "
-                                    f"Temperature: {temp}°C, Humidity: {humidity}% "
-                                    f"With the most probable soil type: {soil_type}"     
-                                    )
+    soil_ph = soil_data.get("properties", {}).get("ph", None)
+
+    # 3. Insert new farm (for demo, name is "My Farm", you can prompt for a name)
+    farm_id = insert_farm(user_id, name="My Farm", latitude=lat, longitude=lon, soil_type=soil_type, soil_ph=soil_ph)
+
+    await update.message.reply_text(
+        f"Location received: {lat}, {lon}"
+        f"\nCurrent weather: {description}, "
+        f"Temperature: {temp}°C, Humidity: {humidity}%"
+        f"\nMost probable soil type: {soil_type}"
+    )
+
+    # 4. Prompt for plant type
     plant_keyboard = [
         [KeyboardButton("Beans"), KeyboardButton("Cannabis")],
         [KeyboardButton("Basil"), KeyboardButton("Other")]
@@ -47,7 +59,9 @@ async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Please select the plant type:",
         reply_markup=ReplyKeyboardMarkup(plant_keyboard, resize_keyboard=True)
     )
-    user_waiting_for_plant.add(user_id)
+    user_waiting_for_plant[user_id] = farm_id
+
+
     
 
 async def set_plant(update: Update, context: ContextTypes.DEFAULT_TYPE):
